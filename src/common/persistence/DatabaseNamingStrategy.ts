@@ -1,12 +1,29 @@
 import { DefaultNamingStrategy, NamingStrategyInterface, Table } from 'typeorm';
 
+export const identifierLengthLimit = 63; // bytes, aka number of characters; details: www.postgresql.org/docs/current/limits.html
+
 export class DatabaseNamingStrategy extends DefaultNamingStrategy implements NamingStrategyInterface {
     private joinColumns(columnNames: string[]): string {
         return columnNames.join('_');
     }
 
+    private getPartialIndexNameSuffix(tableOrName: Table | string, columnNames: string[], where: string): string {
+        const whereClauseMap: Record<string, string> = {
+            '"deletedAt" IS NULL': `deletedAt_IS_NULL`,
+        };
+
+        if (whereClauseMap[where]) {
+            return `WHERE_${whereClauseMap[where]}`;
+        }
+
+        const generatedIndexName = super.indexName(tableOrName, columnNames, where);
+        const { 1: hash } = generatedIndexName.split('IDX_');
+
+        return `WHERE_${hash}`;
+    }
+
     primaryKeyName(tableOrName: Table | string, columnNames: string[]): string {
-        return `PK_${this.getTableName(tableOrName)}_${this.joinColumns(columnNames)}`;
+        return `PK_${this.getTableName(tableOrName)}_${this.joinColumns(columnNames)}`.slice(0, identifierLengthLimit);
     }
 
     foreignKeyName(
@@ -21,14 +38,21 @@ export class DatabaseNamingStrategy extends DefaultNamingStrategy implements Nam
             return `${referencingTableName}_${referencingColumn}_${referencedTablePath}_${referencedColumnNames[index]}`;
         });
 
-        return `FK_${referencingReferencedGroup.join('_')}`;
+        return `FK_${referencingReferencedGroup.join('_')}`.slice(0, identifierLengthLimit);
     }
 
-    indexName(tableOrName: Table | string, columnNames: string[]): string {
-        return `IDX_${this.getTableName(tableOrName)}_${this.joinColumns(columnNames)}`;
+    indexName(tableOrName: Table | string, columnNames: string[], where?: string): string {
+        let indexName = `IDX_${this.getTableName(tableOrName)}_${this.joinColumns(columnNames)}`;
+
+        if (where) {
+            const suffix = this.getPartialIndexNameSuffix(tableOrName, columnNames, where);
+            indexName = `${indexName}_${suffix}`;
+        }
+
+        return indexName.slice(0, identifierLengthLimit);
     }
 
     uniqueConstraintName(tableOrName: Table | string, columnNames: string[]): string {
-        return `UQ_${this.getTableName(tableOrName)}_${this.joinColumns(columnNames)}`;
+        return `UQ_${this.getTableName(tableOrName)}_${this.joinColumns(columnNames)}`.slice(0, identifierLengthLimit);
     }
 }
