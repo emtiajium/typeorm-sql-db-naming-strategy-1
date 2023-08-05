@@ -4,7 +4,7 @@ import { Cohort } from '@/app/domains/entities/Cohort';
 
 @Entity('User')
 @Index(['reference'], {
-    where: `"deletedAt" IS NOT NULL`,
+    where: `"deletedAt" IS NULL`,
     unique: true,
 })
 export class User {

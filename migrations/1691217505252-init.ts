@@ -30,7 +30,7 @@ export class Init1691217505252 implements MigrationInterface {
         `);
         await queryRunner.query(`
             CREATE UNIQUE INDEX "IDX_User_reference" ON "User" ("reference")
-                WHERE "deletedAt" IS NOT NULL
+                WHERE "deletedAt" IS NULL
         `);
         await queryRunner.query(`
             CREATE TABLE "Cohort"
