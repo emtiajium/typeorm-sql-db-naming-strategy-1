@@ -5,6 +5,7 @@ import { ConfigModule, ConfigService } from '@nestjs/config';
 import { DatabaseNamingStrategy } from '@/common/persistence/DatabaseNamingStrategy';
 import { User } from '@/app/domains/entities/User';
 import { Role } from '@/app/domains/entities/Role';
+import { Cohort } from '@/app/domains/entities/Cohort';
 
 @Module({
     imports: [
@@ -21,7 +22,7 @@ import { Role } from '@/app/domains/entities/Role';
                     username: databaseConfig.username,
                     password: databaseConfig.password,
                     database: databaseConfig.database,
-                    entities: [User, Role],
+                    entities: [Cohort, Role, User],
                     synchronize: false,
                     logging: databaseConfig.logging,
                     namingStrategy: new DatabaseNamingStrategy(),
