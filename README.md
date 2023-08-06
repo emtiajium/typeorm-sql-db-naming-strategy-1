@@ -2,7 +2,7 @@
 
 # What is this repository for?
 
-TO BE ADDED!
+[A journey to simplify debugging: Automate generating human-friendly database constraints using TypeORM](https://dev.to/emtiajium/a-journey-to-simplify-debugging-automate-generating-human-friendly-database-constraints-using-typeorm-kap)
 
 # How to Run
 
