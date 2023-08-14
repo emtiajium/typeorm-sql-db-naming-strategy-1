@@ -21,4 +21,5 @@ services:
 
 volumes:
     typeorm-sql-db-naming-strategy-1-postgres-data:
+        name: typeorm-sql-db-naming-strategy-1-postgres-data
         driver: local
